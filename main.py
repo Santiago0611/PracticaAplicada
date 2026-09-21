@@ -53,5 +53,38 @@ def registrar_usuario():
     }), 201
 
 
+@app.route("/usuarios/<int:usuario_id>", methods=["PUT"])
+def editar_usuario(usuario_id):
+    usuario = models.Usuario.query.get(usuario_id)
+
+    if not usuario:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    datos = request.get_json()
+
+    if "nombre" in datos:
+        usuario.nombre = datos["nombre"]
+
+    if "correo" in datos:
+        correo_existente = models.Usuario.query.filter(
+            models.Usuario.correo == datos["correo"],
+            models.Usuario.id != usuario_id
+        ).first()
+        if correo_existente:
+            return jsonify({"error": "Ya existe un usuario registrado con este correo"}), 400
+        usuario.correo = datos["correo"]
+
+    if "contrasena" in datos:
+        usuario.contrasena_hash = auth.hashear_contrasena(datos["contrasena"])
+
+    db.session.commit()
+
+    return jsonify({
+        "id": usuario.id,
+        "nombre": usuario.nombre,
+        "correo": usuario.correo,
+        "rol": usuario.rol
+    }), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
