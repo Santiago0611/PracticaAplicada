@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 from flask import request, jsonify
 from . import app, db, models, auth
 @app.route("/login", methods=["POST"])
@@ -125,3 +127,4 @@ def editar_mascota(mascota_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
+>>>>>>> a8259de19ed9f5b307d63580cea6da35766b2af7
