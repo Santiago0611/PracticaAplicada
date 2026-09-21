@@ -86,5 +86,42 @@ def editar_usuario(usuario_id):
         "rol": usuario.rol
     }), 200
 
+
+@app.route("/mascotas/<int:mascota_id>", methods=["PUT"])
+def editar_mascota(mascota_id):
+    mascota = models.Mascota.query.get(mascota_id)
+
+    if not mascota:
+        return jsonify({"error": "Mascota no encontrada"}), 404
+
+    datos = request.get_json()
+
+    if "nombre" in datos:
+        mascota.nombre = datos["nombre"]
+
+    if "especie" in datos:
+        mascota.especie = datos["especie"]
+
+    if "raza" in datos:
+        mascota.raza = datos["raza"]
+
+    if "peso" in datos:
+        mascota.peso = datos["peso"]
+
+    if "foto" in datos:
+        mascota.foto = datos["foto"]
+
+    db.session.commit()
+
+    return jsonify({
+        "id": mascota.id,
+        "propietario_id": mascota.propietario_id,
+        "nombre": mascota.nombre,
+        "especie": mascota.especie,
+        "raza": mascota.raza,
+        "peso": float(mascota.peso) if mascota.peso else None,
+        "foto": mascota.foto
+    }), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
