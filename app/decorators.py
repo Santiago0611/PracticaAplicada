@@ -3,7 +3,7 @@ from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 
-from app.models import Usuario
+from .models import Usuario
 
 
 def usuario_actual() -> Usuario | None:

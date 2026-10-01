@@ -43,6 +43,7 @@ class Usuario(db.Model):
 
 class Mascota(db.Model):
     __tablename__ = "mascota"
+    ESPECIES_VALIDAS = ("PERRO", "GATO", "AVE", "CONEJO", "REPTIL", "OTRO")
 
     id = db.Column(db.Integer, primary_key=True)
     propietario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False, index=True)
