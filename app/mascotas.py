@@ -97,7 +97,7 @@ def listar_mascotas(usuario_actual: Usuario):
     if usuario_actual.es_propietario():
         query = query.filter_by(propietario_id=usuario_actual.id)
 
-        mascotas = query.order_by(Mascota.id.desc()).all()
+    mascotas = query.order_by(Mascota.id.desc()).all()
     return jsonify([m.to_dict() for m in mascotas]), 200
 
 
