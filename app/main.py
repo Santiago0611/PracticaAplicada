@@ -2,6 +2,7 @@ from flask import request, jsonify
 from . import app, db, models, auth
 from .mascotas import mascotas_bp
 from .decorators import requiere_rol
+from .validaciones import validar_correo, validar_contrasena
 
 app.register_blueprint(mascotas_bp)
 
@@ -30,6 +31,14 @@ def login():
 @app.route("/usuarios", methods=["POST"])
 def registrar_usuario():
     datos = request.get_json()
+
+    error_correo = validar_correo(datos.get("correo"))
+    if error_correo:
+        return jsonify({"error": error_correo}), 400
+
+    error_contrasena = validar_contrasena(datos.get("contrasena"))
+    if error_contrasena:
+        return jsonify({"error": error_contrasena}), 400
 
     usuario_existente = models.Usuario.query.filter(
         models.Usuario.correo == datos["correo"]
@@ -69,7 +78,17 @@ def editar_usuario(usuario_id, usuario_actual):
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    datos = request.get_json()
+        datos = request.get_json()
+
+    if "correo" in datos:
+        error_correo = validar_correo(datos["correo"])
+        if error_correo:
+            return jsonify({"error": error_correo}), 400
+
+    if "contrasena" in datos:
+        error_contrasena = validar_contrasena(datos["contrasena"])
+        if error_contrasena:
+            return jsonify({"error": error_contrasena}), 400
 
     if "nombre" in datos:
         usuario.nombre = datos["nombre"]
