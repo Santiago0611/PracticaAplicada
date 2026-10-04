@@ -134,3 +134,9 @@ class RegistroAplicacion(db.Model):
             "dosis": self.dosis,
             "observaciones": self.observaciones,
         }
+class TokenRevocado(db.Model):
+    __tablename__ = "token_revocado"
+
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, unique=True, index=True)
+    fecha_revocado = db.Column(db.DateTime, default=datetime.utcnow)
