@@ -1,15 +1,15 @@
 import bcrypt
-import jwt
 import datetime
-import os
+
+from flask_jwt_extended import create_access_token
+
 
 def crear_token(usuario_id, rol):
-    payload = {
-        "usuario_id": usuario_id,
-        "rol": rol,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
-    }
-    return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
+    return create_access_token(
+        identity=str(usuario_id),
+        additional_claims={"rol": rol},
+        expires_delta=datetime.timedelta(hours=2),
+    )
 
 
 def hashear_contrasena(contrasena):
@@ -19,5 +19,3 @@ def hashear_contrasena(contrasena):
 
 def verificar_contrasena(contrasena_plana, hash_guardado):
     return bcrypt.checkpw(contrasena_plana.encode("utf-8"), hash_guardado.encode("utf-8"))
-
-

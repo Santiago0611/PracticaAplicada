@@ -1,5 +1,9 @@
 from flask import request, jsonify
 from . import app, db, models, auth
+from .mascotas import mascotas_bp
+
+app.register_blueprint(mascotas_bp)
+
 @app.route("/login", methods=["POST"])
 def login():
     datos = request.get_json()
@@ -89,7 +93,7 @@ def editar_usuario(usuario_id):
 
 @app.route("/mascotas/<int:mascota_id>", methods=["PUT"])
 def editar_mascota(mascota_id):
-    mascota = models.Mascota.query.get(mascota_id)
+    mascota = models.Mascota.query.filter_by(id=mascota_id, activo=True).first()
 
     if not mascota:
         return jsonify({"error": "Mascota no encontrada"}), 404

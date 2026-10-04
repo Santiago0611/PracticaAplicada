@@ -4,3 +4,4 @@ pymysql
 bcrypt
 pyjwt
 python-dotenv
+flask-jwt-extended

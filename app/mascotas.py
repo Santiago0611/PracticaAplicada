@@ -2,9 +2,9 @@ from datetime import date, datetime
 
 from flask import Blueprint, jsonify, request
 
-from app import db
-from app.decorators import requiere_rol
-from app.models import Mascota, Usuario
+from . import db
+from .decorators import requiere_rol
+from .models import Mascota, Usuario
 
 mascotas_bp = Blueprint("mascotas", __name__)
 
@@ -80,7 +80,7 @@ def registrar_mascota(usuario_actual: Usuario):
         especie=limpio["especie"],
         raza=limpio["raza"],
         fecha_nacimiento=limpio["fecha_nacimiento"],
-        peso_kg=limpio["peso_kg"],
+        peso=limpio["peso_kg"],
     )
 
     db.session.add(mascota)
@@ -97,7 +97,7 @@ def listar_mascotas(usuario_actual: Usuario):
     if usuario_actual.es_propietario():
         query = query.filter_by(propietario_id=usuario_actual.id)
 
-    mascotas = query.order_by(Mascota.creado_en.desc()).all()
+    mascotas = query.order_by(Mascota.id.desc()).all()
     return jsonify([m.to_dict() for m in mascotas]), 200
 
 
@@ -113,3 +113,20 @@ def obtener_mascota(mascota_id: int, usuario_actual: Usuario):
         return jsonify({"detalle": "No tienes permiso para consultar esta mascota."}), 403
 
     return jsonify(mascota.to_dict()), 200
+
+
+@mascotas_bp.route("/mascotas/<int:mascota_id>", methods=["DELETE"])
+@requiere_rol(Usuario.ROL_PROPIETARIO)
+def eliminar_mascota(mascota_id: int, usuario_actual: Usuario):
+    mascota = Mascota.query.filter_by(id=mascota_id, activo=True).first()
+
+    if mascota is None:
+        return jsonify({"detalle": "La mascota solicitada no existe o ya fue eliminada."}), 404
+
+    if mascota.propietario_id != usuario_actual.id:
+        return jsonify({"detalle": "No tiene permisos para realizar esta acción."}), 403
+
+    mascota.activo = False
+    db.session.commit()
+
+    return jsonify({"detalle": "Mascota eliminada correctamente."}), 200
