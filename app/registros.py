@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from . import db
 from .decorators import requiere_rol
 from .models import CatalogoProducto, Mascota, RegistroAplicacion
-
+from .calculos import calcular_proxima_dosis
 registros_bp = Blueprint("registros", __name__)
 
 TIPOS_VACUNA = ("vacuna",)
@@ -43,11 +43,12 @@ def _registrar_aplicacion(mascota_id, usuario, tipos_validos, categoria):
     if fecha_aplicacion > date.today():
         return jsonify({"error": "La fecha de aplicación no puede ser posterior a hoy."}), 400
 
-    fecha_proxima = None
     if datos.get("fecha_proxima"):
         fecha_proxima = _parsear_fecha(datos["fecha_proxima"])
         if fecha_proxima is None or fecha_proxima <= fecha_aplicacion:
             return jsonify({"error": "La próxima dosis debe ser una fecha posterior a la aplicación."}), 400
+    else:
+        fecha_proxima = calcular_proxima_dosis(fecha_aplicacion, producto)
 
     duplicado = RegistroAplicacion.query.filter_by(
         mascota_id=mascota.id,
