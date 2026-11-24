@@ -8,6 +8,13 @@ from .models import CatalogoProducto, Mascota, RegistroAplicacion
 
 registros_bp = Blueprint("registros", __name__)
 
+TIPOS_VACUNA = ("vacuna",)
+TIPOS_DESPARASITANTE = (
+    "desparasitante_interno",
+    "desparasitante_externo",
+    "desparasitante_ambos",
+)
+
 
 def _parsear_fecha(valor):
     try:
@@ -16,9 +23,7 @@ def _parsear_fecha(valor):
         return None
 
 
-@registros_bp.route("/mascotas/<int:mascota_id>/vacunas", methods=["POST"])
-@requiere_rol("veterinario")
-def registrar_vacuna(mascota_id, usuario_actual):
+def _registrar_aplicacion(mascota_id, usuario, tipos_validos, categoria):
     datos = request.get_json(silent=True) or {}
 
     mascota = Mascota.query.filter_by(id=mascota_id, activo=True).first()
@@ -26,11 +31,11 @@ def registrar_vacuna(mascota_id, usuario_actual):
         return jsonify({"error": "Mascota no encontrada"}), 404
 
     if not datos.get("catalogo_id"):
-        return jsonify({"error": "El tipo de vacuna es obligatorio."}), 400
+        return jsonify({"error": f"El tipo de {categoria} es obligatorio."}), 400
 
     producto = CatalogoProducto.query.get(datos["catalogo_id"])
-    if not producto or producto.tipo != "vacuna":
-        return jsonify({"error": "La vacuna seleccionada no existe en el catálogo."}), 400
+    if not producto or producto.tipo not in tipos_validos:
+        return jsonify({"error": f"El producto seleccionado no existe en el catálogo de {categoria}s."}), 400
 
     fecha_aplicacion = _parsear_fecha(datos.get("fecha_aplicacion"))
     if fecha_aplicacion is None:
@@ -55,7 +60,7 @@ def registrar_vacuna(mascota_id, usuario_actual):
     registro = RegistroAplicacion(
         mascota_id=mascota.id,
         catalogo_id=producto.id,
-        veterinario_id=usuario_actual.id,
+        veterinario_id=usuario.id,
         fecha_aplicacion=fecha_aplicacion,
         fecha_proxima=fecha_proxima,
         dosis=datos.get("dosis"),
@@ -65,3 +70,15 @@ def registrar_vacuna(mascota_id, usuario_actual):
     db.session.commit()
 
     return jsonify(registro.to_dict()), 201
+
+
+@registros_bp.route("/mascotas/<int:mascota_id>/vacunas", methods=["POST"])
+@requiere_rol("veterinario")
+def registrar_vacuna(mascota_id, usuario_actual):
+    return _registrar_aplicacion(mascota_id, usuario_actual, TIPOS_VACUNA, "vacuna")
+
+
+@registros_bp.route("/mascotas/<int:mascota_id>/desparasitaciones", methods=["POST"])
+@requiere_rol("veterinario")
+def registrar_desparasitacion(mascota_id, usuario_actual):
+    return _registrar_aplicacion(mascota_id, usuario_actual, TIPOS_DESPARASITANTE, "desparasitante")
