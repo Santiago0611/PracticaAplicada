@@ -2,6 +2,7 @@ from flask import request, jsonify
 from . import app, db, models, auth
 from .mascotas import mascotas_bp
 from .registros import registros_bp
+
 from .dosis import dosis_bp
 from .notificaciones import notificaciones_bp
 
@@ -9,6 +10,13 @@ app.register_blueprint(mascotas_bp)
 app.register_blueprint(registros_bp)
 app.register_blueprint(dosis_bp)
 app.register_blueprint(notificaciones_bp)
+
+from .catalogo import catalogo_bp
+
+app.register_blueprint(mascotas_bp)
+app.register_blueprint(registros_bp)
+app.register_blueprint(catalogo_bp)
+
 
 @app.route("/login", methods=["POST"])
 def login():
