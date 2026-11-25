@@ -54,6 +54,7 @@ class Mascota(db.Model):
     peso = db.Column(db.Numeric(5, 2), nullable=True)
     foto = db.Column(db.String(255), nullable=True)
     activo = db.Column(db.Boolean, default=True, nullable=False)
+    sexo = db.Column(db.String(10), nullable=True)
     actualizado_en = db.Column(
         db.DateTime, server_default=db.func.now(), onupdate=datetime.utcnow
     )
@@ -76,6 +77,7 @@ class Mascota(db.Model):
             "peso": float(self.peso) if self.peso is not None else None,
             "foto": self.foto,
             "activo": self.activo,
+            "sexo": self.sexo,
             "actualizado_en": self.actualizado_en.isoformat() if self.actualizado_en else None,
         }
 

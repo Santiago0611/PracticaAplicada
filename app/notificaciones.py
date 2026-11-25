@@ -51,6 +51,7 @@ def enviar_recordatorios(usuario_actual):
     if datos.get("incluir_vencidas"):
         estados.append("vencida")
 
+
     config = _config_correo()
     if config is None:
         return jsonify({"error": "El servicio de correo no está configurado."}), 500
