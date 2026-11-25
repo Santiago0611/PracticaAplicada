@@ -1,62 +1,632 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg-top: #eef8f6;
+  --bg-bottom: #fef8ee;
+  --papel: rgba(255, 255, 255, 0.92);
+  --papel-solido: #ffffff;
+  --tinta: #0f172a;
+  --tinta-suave: #475569;
+  --linea: #e2e8f0;
+  --boligrafo: #0d9488;
+  --boligrafo-osc: #0f766e;
+  --boligrafo-suave: #ccfbf1;
+  --acento-calido: #f59e0b;
+  --rojo: #dc2626;
+  --ambar: #d97706;
+  --verde: #059669;
+  --sombra: 0 14px 34px -10px rgba(15, 23, 42, 0.09);
+  --sombra-hover: 0 18px 40px -12px rgba(13, 148, 136, 0.18);
+  --radio: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f3f6f4;
-  color: #1f2933;
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  color: var(--tinta);
+  line-height: 1.5;
+  background-color: var(--bg-top);
+  background-image:
+    radial-gradient(circle at 12% 10%, rgba(13, 148, 136, 0.16), transparent 36%),
+    radial-gradient(circle at 88% 15%, rgba(245, 158, 11, 0.16), transparent 38%),
+    radial-gradient(circle at 50% 92%, rgba(56, 189, 248, 0.14), transparent 44%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='%230d9488' fill-opacity='0.065'%3E%3Cellipse cx='24' cy='28' rx='6' ry='5'/%3E%3Ccircle cx='16' cy='20' r='2.5'/%3E%3Ccircle cx='21' cy='17' r='2.5'/%3E%3Ccircle cx='27' cy='17' r='2.5'/%3E%3Ccircle cx='32' cy='20' r='2.5'/%3E%3Cellipse cx='72' cy='76' rx='6' ry='5' transform='rotate(-18 72 76)'/%3E%3Ccircle cx='64' cy='68' r='2.5'/%3E%3Ccircle cx='69' cy='65' r='2.5'/%3E%3Ccircle cx='75' cy='65' r='2.5'/%3E%3Ccircle cx='80' cy='68' r='2.5'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(200deg, var(--bg-top) 50%, var(--bg-bottom) 100%);
+  background-size: auto, auto, auto, 100px 96px, auto;
+  background-attachment: fixed;
 }
-.tarjeta {
-  max-width: 380px;
-  margin: 80px auto;
-  background: #fff;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-.tarjeta h1 { margin-top: 0; font-size: 1.5rem; }
-label { display: block; margin: 14px 0 4px; font-size: 0.9rem; }
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #c5cdd3;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-size: 1rem;
-}
-button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 11px;
-  border: 0;
-  border-radius: 8px;
-  background: #2f855a;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-}
-button:hover { background: #276749; }
-.error { color: #c53030; margin-top: 12px; font-size: 0.9rem; }
 
-.contenedor { max-width: 760px; margin: 24px auto; padding: 0 16px; }
-.barra { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.barra button { width: auto; margin: 0; padding: 8px 14px; }
-.formulario { display: grid; gap: 8px; margin-bottom: 20px; }
-.formulario button { margin-top: 4px; }
-.lista { list-style: none; padding: 0; }
-.lista li { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; }
-.lista button { width: auto; margin: 0; padding: 6px 12px; }
-.peligro { background: #c53030; }
-.peligro:hover { background: #9b2c2c; }
-select { padding: 10px; border: 1px solid #c5cdd3; border-radius: 8px; font-size: 1rem; }
-.dosis { border-left: 6px solid #a0aec0; }
-.dosis.vencida { border-left-color: #c53030; }
-.dosis.proxima { border-left-color: #d69e2e; }
-.dosis.al_dia { border-left-color: #2f855a; }
-.detalle { font-size: 0.85rem; color: #52606d; margin-top: 2px; }
-.etiqueta { font-size: 0.85rem; font-weight: 600; }
-.dosis.vencida .etiqueta { color: #c53030; }
-.dosis.proxima .etiqueta { color: #b7791f; }
-.dosis.al_dia .etiqueta { color: #2f855a; }
-.pestanas { display: flex; gap: 8px; margin-bottom: 12px; }
-.pestanas button { margin: 0; background: #cbd5e0; color: #1f2933; }
-.pestanas button.activa { background: #2f855a; color: #fff; }
-.exito { color: #276749; margin-top: 12px; font-size: 0.9rem; }
+h1, h2, h3 {
+  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Estructura Principal ---------- */
+.contenedor {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--papel);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.marca {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--tinta);
+}
+
+.marca::before {
+  content: "🐾";
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--boligrafo), #14b8a6);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 14px -4px rgba(13, 148, 136, 0.45);
+}
+
+.sesion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.rol {
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--boligrafo-osc);
+  background: var(--boligrafo-suave);
+}
+
+/* ---------- Tarjetas de Secciones ---------- */
+section {
+  margin-top: 0;
+  background: var(--papel);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: var(--radio);
+  padding: 26px;
+  box-shadow: var(--sombra);
+  transition: box-shadow 0.25s ease;
+}
+
+section:hover {
+  box-shadow: var(--sombra-hover);
+}
+
+section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tinta);
+}
+
+section > select {
+  width: auto;
+  min-width: 220px;
+  margin-bottom: 14px;
+}
+
+/* ---------- Formularios e Inputs ---------- */
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--tinta-suave);
+}
+
+input, select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  background: var(--papel-solido);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.94rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+input:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--boligrafo);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+}
+
+button {
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--boligrafo), #14b8a6);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.94rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -4px rgba(13, 148, 136, 0.4);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+button:hover {
+  filter: brightness(0.95);
+  box-shadow: 0 8px 20px -4px rgba(13, 148, 136, 0.5);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.fantasma {
+  background: #ffffff;
+  color: var(--tinta);
+  border-color: #cbd5e1;
+  box-shadow: none;
+}
+
+.fantasma:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  box-shadow: none;
+}
+
+.peligro {
+  background: #fef2f2;
+  color: var(--rojo);
+  border-color: #fecaca;
+  box-shadow: none;
+}
+
+.peligro:hover {
+  background: #fee2e2;
+  box-shadow: none;
+}
+
+.enlace {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--boligrafo-osc);
+  text-decoration: underline;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.enlace:hover {
+  background: none;
+  color: var(--boligrafo);
+  box-shadow: none;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.formulario label {
+  margin: 4px 0 0;
+}
+
+.formulario button {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding: 13px;
+}
+
+.pestanas {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--linea);
+  margin-bottom: 16px;
+}
+
+.pestanas button {
+  background: transparent;
+  color: var(--tinta-suave);
+  border-radius: 10px;
+  box-shadow: none;
+  padding: 8px 16px;
+}
+
+.pestanas button.activa {
+  background: #ffffff;
+  color: var(--boligrafo-osc);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.filtros select {
+  width: auto;
+  min-width: 210px;
+}
+
+.error {
+  color: var(--rojo);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.exito {
+  color: var(--verde);
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ---------- Login y Registro ---------- */
+.auth-fondo {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 36px 32px;
+  background: var(--papel);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-top: 6px solid var(--boligrafo);
+  border-radius: 24px;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.14);
+}
+
+.auth-cabecera {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.auth-icono {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--boligrafo), #14b8a6);
+  color: #fff;
+  font-size: 1.7rem;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 20px -6px rgba(13, 148, 136, 0.5);
+}
+
+.tarjeta h1 {
+  margin: 0 0 4px;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.auth-subtitulo {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--tinta-suave);
+}
+
+.tarjeta button[type="submit"] {
+  width: 100%;
+  margin-top: 22px;
+  padding: 13px;
+  font-size: 1rem;
+}
+
+.cambio {
+  text-align: center;
+  margin: 18px 0 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+/* ---------- Listas con renglones ---------- */
+.lista {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+.lista li:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.lista button {
+  padding: 7px 13px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Dosis con sello ---------- */
+.lista li.dosis {
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.dosis { --c: var(--tinta-suave); }
+.dosis.vencida { --c: var(--rojo); }
+.dosis.proxima { --c: var(--ambar); }
+.dosis.al_dia { --c: var(--verde); }
+
+.sello {
+  flex: none;
+  width: 82px;
+  height: 82px;
+  border: 3px solid var(--c);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 3px #ffffff, inset 0 0 0 4.5px var(--c);
+  color: var(--c);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.1;
+  transform: rotate(-5deg);
+}
+
+.sello strong {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.65rem;
+}
+
+.sello span {
+  font-size: 0.62rem;
+  max-width: 58px;
+  font-weight: 700;
+}
+
+.dosis-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dosis-info > strong {
+  font-size: 1.05rem;
+}
+
+.detalle {
+  font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+
+.estado {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c);
+}
+
+/* ---------- Tabla de historial ---------- */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.tabla th {
+  text-align: left;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-bottom: 2px solid var(--linea);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--tinta-suave);
+}
+
+.tabla td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--linea);
+  font-size: 0.92rem;
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- Móvil ---------- */
+@media (max-width: 600px) {
+  .barra {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tarjeta {
+    padding: 26px 20px;
+  }
+  .sello {
+    width: 72px;
+    height: 72px;
+  }
+  .sello strong {
+    font-size: 1.4rem;
+  }
+  .tabla {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button, section, .lista li {
+    transition: none;
+  }
+}
+
+.vacio {
+  margin: 8px 0 0;
+  padding: 18px;
+  text-align: center;
+  color: var(--tinta-suave);
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+  font-size: 0.92rem;
+}
+
+.mascota-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mascota-avatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 14px;
+  background: var(--boligrafo-suave);
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+}
+
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.metrica-card {
+  background: var(--papel);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metrica-valor {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--boligrafo-osc);
+}
+
+.metrica-card.proxima .metrica-valor {
+  color: var(--ambar);
+}
+
+.metrica-card.vencida .metrica-valor {
+  color: var(--rojo);
+}
+
+.metrica-etiqueta {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--tinta-suave);
+}
+
+.recordatorios-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--tinta);
+}
+
+.check-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--boligrafo);
+}
+
+.detalle-lista {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 600px) {
+  .metricas {
+    grid-template-columns: 1fr;
+  }
+}

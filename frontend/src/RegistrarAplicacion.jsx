@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 
-const VACIO = { mascota_id: "", catalogo_id: "", fecha_aplicacion: "", fecha_proxima: "", dosis: "", observaciones: "" };
+const VACIO = {
+  mascota_id: "",
+  catalogo_id: "",
+  fecha_aplicacion: "",
+  fecha_proxima: "",
+  dosis: "",
+  observaciones: "",
+};
 
 export default function RegistrarAplicacion({ usuario, onRegistrado }) {
   const [categoria, setCategoria] = useState("vacuna");
@@ -66,12 +73,20 @@ export default function RegistrarAplicacion({ usuario, onRegistrado }) {
 
   return (
     <section>
-      <h2>Registrar aplicación</h2>
+      <h2>💉 Registrar aplicación</h2>
       <div className="pestanas">
-        <button type="button" className={categoria === "vacuna" ? "activa" : ""} onClick={() => cambiarCategoria("vacuna")}>
+        <button
+          type="button"
+          className={categoria === "vacuna" ? "activa" : ""}
+          onClick={() => cambiarCategoria("vacuna")}
+        >
           Vacuna
         </button>
-        <button type="button" className={categoria === "desparasitante" ? "activa" : ""} onClick={() => cambiarCategoria("desparasitante")}>
+        <button
+          type="button"
+          className={categoria === "desparasitante" ? "activa" : ""}
+          onClick={() => cambiarCategoria("desparasitante")}
+        >
           Desparasitación
         </button>
       </div>
@@ -80,25 +95,51 @@ export default function RegistrarAplicacion({ usuario, onRegistrado }) {
         <select name="mascota_id" value={form.mascota_id} onChange={cambiar} required>
           <option value="">Mascota</option>
           {mascotas.map((m) => (
-            <option key={m.id} value={m.id}>{m.nombre} ({m.especie})</option>
+            <option key={m.id} value={m.id}>
+              {m.nombre} ({m.especie})
+            </option>
           ))}
         </select>
 
         <select name="catalogo_id" value={form.catalogo_id} onChange={cambiar} required>
           <option value="">Producto</option>
           {productos.map((p) => (
-            <option key={p.id} value={p.id}>{p.nombre}</option>
+            <option key={p.id} value={p.id}>
+              {p.nombre}
+            </option>
           ))}
         </select>
 
         <label>Fecha de aplicación</label>
-        <input name="fecha_aplicacion" type="date" max={hoy} value={form.fecha_aplicacion} onChange={cambiar} required />
+        <input
+          name="fecha_aplicacion"
+          type="date"
+          max={hoy}
+          value={form.fecha_aplicacion}
+          onChange={cambiar}
+          required
+        />
 
         <label>Próxima dosis (opcional)</label>
-        <input name="fecha_proxima" type="date" value={form.fecha_proxima} onChange={cambiar} />
+        <input
+          name="fecha_proxima"
+          type="date"
+          value={form.fecha_proxima}
+          onChange={cambiar}
+        />
 
-        <input name="dosis" placeholder="Dosis (opcional)" value={form.dosis} onChange={cambiar} />
-        <input name="observaciones" placeholder="Observaciones (opcional)" value={form.observaciones} onChange={cambiar} />
+        <input
+          name="dosis"
+          placeholder="Dosis (opcional)"
+          value={form.dosis}
+          onChange={cambiar}
+        />
+        <input
+          name="observaciones"
+          placeholder="Observaciones (opcional)"
+          value={form.observaciones}
+          onChange={cambiar}
+        />
 
         <button type="submit">Guardar registro</button>
       </form>
