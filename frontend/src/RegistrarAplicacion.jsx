@@ -10,9 +10,8 @@ const VACIO = {
   observaciones: "",
 };
 
-export default function RegistrarAplicacion({ usuario, onRegistrado }) {
+export default function RegistrarAplicacion({ usuario, mascotas, onRegistrado }) {
   const [categoria, setCategoria] = useState("vacuna");
-  const [mascotas, setMascotas] = useState([]);
   const [catalogo, setCatalogo] = useState([]);
   const [form, setForm] = useState(VACIO);
   const [error, setError] = useState("");
@@ -24,7 +23,6 @@ export default function RegistrarAplicacion({ usuario, onRegistrado }) {
     if (!esVeterinario) return;
     async function cargar() {
       try {
-        setMascotas(await api("/mascotas"));
         setCatalogo(await api("/catalogo"));
       } catch (err) {
         setError(err.message);

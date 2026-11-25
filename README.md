@@ -1,66 +1,76 @@
-# PracticaAplicada — Control de Vacunación de Mascotas
+# PracticaAplicada
 
-Plataforma digital para el registro y control de vacunación y desparasitación de mascotas, con gestión de propietarios y veterinarios.
+Plataforma para el seguimiento de vacunación y desparasitación de mascotas. El backend usa Flask y SQLAlchemy con MySQL o MariaDB, y el frontend usa React y Vite.
 
-## Stack
+## Puesta en marcha
 
-- **Backend:** Python + Flask + Flask-SQLAlchemy
-- **Base de datos:** MySQL (probado con XAMPP)
-- **Autenticación:** JWT (PyJWT) + hashing de contraseñas con bcrypt
+1. Desde la raíz del repositorio, crea un entorno de Python e instala las dependencias.
 
-## Cómo levantar el proyecto en tu computador
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   python -m pip install -r requirements.txt
+   ```
 
-### 1. Clona el repositorio y entra a la carpeta
+   En Windows, activa el entorno con `venv\Scripts\activate`.
 
-```bash
-git clone https://github.com/Santiago0611/PracticaAplicada.git
-cd PracticaAplicada
-```
+2. Para una instalación nueva, crea la base `control_vacunacion_mascotas` en MySQL y carga `database/control_vacunacion_mascotas.sql` con tu cliente habitual. Crea un archivo `.env` en la raíz con los datos de tu instalación.
 
-### 2. Crea y activa el entorno virtual
+   ```dotenv
+   DATABASE_URL=mysql+pymysql://usuario:contrasena@127.0.0.1:3306/control_vacunacion_mascotas
+   SECRET_KEY=tu_clave_generada
+   ```
 
-```bash
-python -m venv venv
-venv\Scripts\activate      # Windows
-source venv/bin/activate   # Mac/Linux
-```
+   Genera la clave con `python -c "import secrets; print(secrets.token_hex(32))"`.
 
-### 3. Instala las dependencias
+3. Si ya tienes la base de una versión anterior, actualízala con este comando. Conserva las mascotas y el historial existente. Los propietarios conceden el acceso desde la ficha de cada mascota, incluso si el veterinario ya registró aplicaciones antes de la actualización.
 
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   python -m flask --app app.main actualizar-esquema
+   ```
 
-### 4. Crea la base de datos
+4. Inicia Flask desde la raíz del repositorio.
 
-1. Prende MySQL (por ejemplo con XAMPP).
-2. Abre phpMyAdmin y crea una base de datos llamada `control_vacunacion_mascotas`.
-3. Ve a la pestaña **Importar**, selecciona el archivo `database/control_vacunacion_mascotas.sql` de este repositorio, y dale a **Continuar**.
+   ```bash
+   python -m app.main
+   ```
 
+5. Abre otra terminal para iniciar el frontend y entra a la dirección que indica Vite.
 
-Ajusta el usuario/contraseña de MySQL según tu instalación.
+   ```bash
+   cd frontend
+   npm ci
+   npm run dev
+   ```
 
-### 6. Corre el servidor
+   Por defecto la interfaz busca el backend en `http://localhost:5000`. Para usar otra dirección, define `VITE_API_URL` en el archivo `frontend/.env.local`.
 
-```bash
-python -m app.main
-```
+## Permisos e historial
 
-El servidor queda disponible en `http://127.0.0.1:5000`.
+El propietario registra sus mascotas y consulta sus fichas e historiales. En **Mascotas → Consultar** puede autorizar a un veterinario con el correo registrado de su cuenta y retirar el acceso cuando lo necesite.
 
-## Endpoints disponibles
+El veterinario ve las mascotas que le han autorizado y su historial completo. Puede registrar aplicaciones para esas mascotas, y editar o eliminar las aplicaciones que él mismo registró. Si cambia la fecha de aplicación o el producto y deja vacía la próxima dosis, se utiliza el intervalo del catálogo.
 
-| Método | Ruta | Descripción |
+En **Historial** se puede buscar por producto, veterinario, dosis u observaciones y combinar la búsqueda con filtros de tipo y de fechas. Los totales de aplicaciones incluyen todos los registros de las mascotas visibles. Los estados de dosis se calculan a partir de la última aplicación de cada producto por mascota.
+
+| Método | Ruta | Uso |
 |---|---|---|
-| POST | `/usuarios` | Registra un nuevo usuario (propietario o veterinario) |
-| POST | `/login` | Inicia sesión y devuelve un token JWT |
+| POST | `/usuarios`, `/login` | Registro de cuenta e inicio de sesión |
+| POST | `/logout` | Cierre de sesión y revocación del token |
+| GET, POST | `/mascotas` | Lista de mascotas visibles y registro por su propietario |
+| GET | `/mascotas/<id>` | Ficha de una mascota visible |
+| GET, POST | `/mascotas/<id>/veterinarios` | Consulta y autorización de veterinarios por el propietario |
+| DELETE | `/mascotas/<id>/veterinarios/<vet_id>` | Retiro del acceso del veterinario |
+| GET | `/mascotas/<id>/historial` | Historial con filtros opcionales `q`, `tipo`, `desde` y `hasta` |
+| PUT, DELETE | `/mascotas/<id>/registros/<registro_id>` | Edición y eliminación por el veterinario que registró la aplicación |
+| GET | `/estadisticas` | Indicadores de las mascotas visibles para la cuenta |
+
+## Pruebas
+
+Ejecuta las pruebas de seguimiento con `python -m unittest discover -s tests -v`. Usan una base SQLite en memoria.
 
 ## Equipo
 
 - Valeria Álvarez
 - Mauro Santiago Sánchez Zambrano
 - Nicolle Castro Delgado
-
-### 5. Crea tu archivo `.env`
-
-En la raíz del proyecto, crea un archivo `.env` (no se sube a GitHub) con:

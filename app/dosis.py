@@ -2,7 +2,10 @@ import os
 from datetime import date, timedelta
 
 from flask import Blueprint, jsonify, request
+from sqlalchemy.orm import contains_eager, joinedload
 
+from .acceso import filtro_mascotas_visibles
+from .calculos import calcular_proxima_dosis
 from .decorators import requiere_rol
 from .models import Mascota, RegistroAplicacion
 
@@ -15,10 +18,7 @@ ESTADOS_VALIDOS = ("vigente", "proxima", "vencida")
 def _fecha_vencimiento(registro):
     if registro.fecha_proxima:
         return registro.fecha_proxima
-    intervalo = registro.producto.intervalo_dias
-    if intervalo:
-        return registro.fecha_aplicacion + timedelta(days=intervalo)
-    return None
+    return calcular_proxima_dosis(registro.fecha_aplicacion, registro.producto)
 
 
 def _clasificar(fecha_vencimiento, hoy):
@@ -29,20 +29,15 @@ def _clasificar(fecha_vencimiento, hoy):
     return "vigente"
 
 
-def obtener_dosis(usuario=None, hoy=None):
-    """Devuelve el estado de la última aplicación de cada producto por mascota.
-
-    Si recibe un propietario, solo incluye sus mascotas. Sin usuario, incluye todas
-    (lo usará el envío de recordatorios).
-    """
+def obtener_dosis(usuario, hoy=None):
+    """Devuelve el estado de la última aplicación por producto y mascota visible."""
     hoy = hoy or date.today()
 
-    consulta = RegistroAplicacion.query.join(
-        Mascota, RegistroAplicacion.mascota_id == Mascota.id
-    ).filter(Mascota.activo.is_(True))
-
-    if usuario is not None and usuario.es_propietario():
-        consulta = consulta.filter(Mascota.propietario_id == usuario.id)
+    consulta = (
+        RegistroAplicacion.query.join(RegistroAplicacion.mascota)
+        .options(contains_eager(RegistroAplicacion.mascota), joinedload(RegistroAplicacion.producto))
+        .filter(Mascota.activo.is_(True), filtro_mascotas_visibles(usuario))
+    )
 
     registros = consulta.order_by(
         RegistroAplicacion.fecha_aplicacion.asc(), RegistroAplicacion.id.asc()

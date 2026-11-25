@@ -194,6 +194,11 @@ button:active {
   transform: scale(0.98);
 }
 
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .fantasma {
   background: #ffffff;
   color: var(--tinta);
@@ -384,7 +389,7 @@ button:active {
   gap: 10px;
 }
 
-.lista li {
+.lista > li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -396,7 +401,7 @@ button:active {
   transition: transform 0.15s ease, border-color 0.2s ease;
 }
 
-.lista li:hover {
+.lista > li:hover {
   border-color: #cbd5e1;
   transform: translateY(-1px);
 }
@@ -623,6 +628,96 @@ button:active {
   padding-left: 20px;
   font-size: 0.88rem;
   color: var(--tinta-suave);
+}
+
+.acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lista-mascotas > li {
+  flex-wrap: wrap;
+}
+
+.ficha-mascota {
+  flex: 0 0 100%;
+  min-width: 0;
+  border-top: 1px solid var(--linea);
+  padding-top: 12px;
+}
+
+.ficha-mascota dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.ficha-mascota dt {
+  font-weight: 700;
+}
+
+.ficha-mascota dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.lista-veterinarios {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.lista-veterinarios li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  overflow-wrap: anywhere;
+}
+
+.ficha-mascota .filtros,
+.filtros-historial {
+  align-items: end;
+}
+
+.ficha-mascota .filtros label,
+.filtros-historial label {
+  margin: 0;
+}
+
+.filtros-historial {
+  margin-top: 14px;
+}
+
+.filtros-historial label:first-child {
+  flex: 1 1 238px;
+}
+
+.filtros-historial select {
+  width: 100%;
+  min-width: 0;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.tabla-contenedor .tabla {
+  display: table;
+}
+
+.tabla .acciones {
+  flex-wrap: nowrap;
+}
+
+.edicion-aplicacion .formulario > .acciones {
+  grid-column: 1 / -1;
 }
 
 @media (max-width: 600px) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api } from "./api";
 
-export default function Login({ onLogin, onIrARegistro }) {
+export default function Login({ aviso, onLogin, onIrARegistro }) {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
@@ -58,7 +58,7 @@ export default function Login({ onLogin, onIrARegistro }) {
           </button>
         </p>
 
-        {error && <p className="error">{error}</p>}
+        {(error || aviso) && <p className="error" role="alert">{error || aviso}</p>}
       </form>
     </div>
   );

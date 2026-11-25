@@ -1,59 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "./api";
+import DetalleMascota from "./DetalleMascota";
 
-function iconoEspecie(especie = "") {
-  const e = especie.toLowerCase();
-  if (e.includes("perro") || e.includes("can")) return "🐶";
-  if (e.includes("gato") || e.includes("fel")) return "🐱";
-  if (e.includes("conejo")) return "🐰";
-  if (e.includes("ave") || e.includes("pájaro") || e.includes("pajaro") || e.includes("loro")) return "🐦";
-  return "🐾";
-}
+const ESPECIES = ["PERRO", "GATO", "AVE", "CONEJO", "REPTIL", "OTRO"];
+const AVATARES = { PERRO: "🐶", GATO: "🐱", AVE: "🐦", CONEJO: "🐰", REPTIL: "🦎" };
+const VACIO = {
+  nombre: "", especie: "", raza: "", fecha_nacimiento: "", peso_kg: "", sexo: "",
+};
 
-function calcularEdad(fechaStr) {
-  if (!fechaStr) return null;
-  const nacimiento = new Date(`${fechaStr}T00:00:00`);
-  if (Number.isNaN(nacimiento.getTime())) return null;
-
-  const hoy = new Date();
-  let meses =
-    (hoy.getFullYear() - nacimiento.getFullYear()) * 12 +
-    (hoy.getMonth() - nacimiento.getMonth());
-  if (hoy.getDate() < nacimiento.getDate()) meses -= 1;
-  if (meses < 0) return null;
-
-  if (meses < 12) {
-    return meses === 1 ? "1 mes" : `${meses} meses`;
-  }
-  const años = Math.floor(meses / 12);
-  const restoMeses = meses % 12;
-  const textoAnos = años === 1 ? "1 año" : `${años} años`;
-  return restoMeses > 0 ? `${textoAnos} ${restoMeses}m` : textoAnos;
-}
-
-export default function Mascotas({ usuario, onCambio }) {
-  const [mascotas, setMascotas] = useState([]);
+export default function Mascotas({
+  usuario, mascotas, errorCarga, version, onCambio, onHistorial,
+}) {
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    nombre: "",
-    especie: "",
-    raza: "",
-    fecha_nacimiento: "",
-    peso_kg: "",
-    sexo: "",
-  });
-
-  async function cargar() {
-    try {
-      setMascotas(await api("/mascotas"));
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  useEffect(() => {
-    cargar();
-  }, []);
+  const [form, setForm] = useState(VACIO);
+  const [detalleId, setDetalleId] = useState(null);
+  const [ocupado, setOcupado] = useState(false);
+  const esPropietario = usuario.rol === "propietario";
 
   function cambiar(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -62,122 +24,126 @@ export default function Mascotas({ usuario, onCambio }) {
   async function crear(e) {
     e.preventDefault();
     setError("");
-    const body = { ...form };
-    if (!body.sexo) delete body.sexo;
-    if (!body.fecha_nacimiento) delete body.fecha_nacimiento;
-    if (body.peso_kg === "") delete body.peso_kg;
+    setOcupado(true);
     try {
-      await api("/mascotas", { method: "POST", body });
-      setForm({
-        nombre: "",
-        especie: "",
-        raza: "",
-        fecha_nacimiento: "",
-        peso_kg: "",
-        sexo: "",
-      });
-      cargar();
-      if (onCambio) onCambio();
+      const mascota = await api("/mascotas", { method: "POST", body: form });
+      setForm(VACIO);
+      setDetalleId(mascota.id);
+      onCambio();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setOcupado(false);
     }
   }
 
-  async function eliminar(id) {
-    if (!window.confirm("¿Eliminar esta mascota?")) return;
+  async function eliminar(mascota) {
+    if (!window.confirm(`¿Eliminar a ${mascota.nombre}?`)) return;
+    setError("");
+    setOcupado(true);
     try {
-      await api(`/mascotas/${id}`, { method: "DELETE" });
-      cargar();
-      if (onCambio) onCambio();
+      await api(`/mascotas/${mascota.id}`, { method: "DELETE" });
+      if (detalleId === mascota.id) setDetalleId(null);
+      onCambio();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setOcupado(false);
     }
   }
-
-  const esPropietario = usuario.rol === "propietario";
 
   return (
     <section>
-      <h2>🐶 Mascotas</h2>
-      {error && <p className="error">{error}</p>}
+      <h2>🐶 {esPropietario ? "Mascotas" : "Pacientes"}</h2>
+      {(error || errorCarga) && <p className="error" role="alert">{error || errorCarga}</p>}
 
       {esPropietario && (
         <form onSubmit={crear} className="formulario">
-          <input
-            name="nombre"
-            placeholder="Nombre"
-            value={form.nombre}
-            onChange={cambiar}
-            required
-          />
-          <input
-            name="especie"
-            placeholder="Especie (ej: PERRO)"
-            value={form.especie}
-            onChange={cambiar}
-            required
-          />
-          <input
-            name="raza"
-            placeholder="Raza"
-            value={form.raza}
-            onChange={cambiar}
-          />
-          <input
-            name="fecha_nacimiento"
-            type="date"
-            value={form.fecha_nacimiento}
-            onChange={cambiar}
-          />
-          <input
-            name="peso_kg"
-            type="number"
-            step="0.01"
-            placeholder="Peso (kg)"
-            value={form.peso_kg}
-            onChange={cambiar}
-          />
-          <select name="sexo" value={form.sexo} onChange={cambiar}>
-            <option value="">Sexo (opcional)</option>
-            <option value="macho">Macho</option>
-            <option value="hembra">Hembra</option>
-          </select>
-          <button type="submit">+ Agregar mascota</button>
+          <label>
+            Nombre
+            <input name="nombre" value={form.nombre} onChange={cambiar} maxLength={100} required />
+          </label>
+          <label>
+            <span id="etiqueta-especie">Especie</span>
+            <select name="especie" aria-labelledby="etiqueta-especie" value={form.especie} onChange={cambiar} required>
+              <option value="">Selecciona una especie</option>
+              {ESPECIES.map((especie) => <option key={especie}>{especie}</option>)}
+            </select>
+          </label>
+          <label>
+            Raza (opcional)
+            <input name="raza" value={form.raza} onChange={cambiar} maxLength={100} />
+          </label>
+          <label>
+            Fecha de nacimiento (opcional)
+            <input name="fecha_nacimiento" type="date" value={form.fecha_nacimiento} onChange={cambiar} />
+          </label>
+          <label>
+            Peso en kg (opcional)
+            <input
+              name="peso_kg" type="number" min="0.01" max="999.99" step="0.01"
+              value={form.peso_kg} onChange={cambiar}
+            />
+          </label>
+          <label>
+            <span id="etiqueta-sexo">Sexo (opcional)</span>
+            <select name="sexo" aria-labelledby="etiqueta-sexo" value={form.sexo} onChange={cambiar}>
+              <option value="">Selecciona el sexo</option>
+              <option value="macho">Macho</option>
+              <option value="hembra">Hembra</option>
+            </select>
+          </label>
+          <button type="submit" disabled={ocupado}>Agregar mascota</button>
         </form>
       )}
 
-      {mascotas.length === 0 && (
-        <p className="vacio">No hay mascotas registradas todavía.</p>
+      {mascotas === null && !errorCarga && <p className="vacio">Cargando mascotas…</p>}
+      {mascotas?.length === 0 && (
+        <p className="vacio">
+          {esPropietario ? "Aún no tienes mascotas registradas." : "Aún no tienes pacientes autorizados."}
+        </p>
       )}
 
-      <ul className="lista">
-        {mascotas.map((m) => {
-          const edad = calcularEdad(m.fecha_nacimiento);
-          return (
-            <li key={m.id}>
-              <div className="mascota-item">
-                <span className="mascota-avatar" aria-hidden="true">
-                  {iconoEspecie(m.especie)}
-                </span>
-                <div>
-                  <strong>{m.nombre}</strong>
-                  <div className="detalle">
-                    {m.especie}
-                    {m.raza && ` · ${m.raza}`}
-                    {edad && ` · ${edad}`}
-                    {m.sexo && ` · ${m.sexo}`}
-                    {(m.peso_kg ?? m.peso) && ` · ${m.peso_kg ?? m.peso} kg`}
-                  </div>
+      <ul className="lista lista-mascotas">
+        {mascotas?.map((mascota) => (
+          <li key={mascota.id}>
+            <div className="mascota-item">
+              <span className="mascota-avatar" aria-hidden="true">{AVATARES[mascota.especie] || "🐾"}</span>
+              <div>
+                <strong>{mascota.nombre}</strong>
+                <div className="detalle">
+                  {[mascota.especie, mascota.raza, mascota.sexo, mascota.peso != null && `${mascota.peso} kg`]
+                    .filter(Boolean).join(" · ")}
                 </div>
               </div>
+            </div>
+            <div className="acciones">
+              <button
+                type="button"
+                className="fantasma"
+                aria-expanded={detalleId === mascota.id}
+                aria-controls={detalleId === mascota.id ? "detalle-mascota" : undefined}
+                onClick={() => setDetalleId(detalleId === mascota.id ? null : mascota.id)}
+              >
+                {detalleId === mascota.id ? "Cerrar ficha" : "Consultar"}
+              </button>
               {esPropietario && (
-                <button className="peligro" onClick={() => eliminar(m.id)}>
+                <button type="button" className="peligro" disabled={ocupado} onClick={() => eliminar(mascota)}>
                   Eliminar
                 </button>
               )}
-            </li>
-          );
-        })}
+            </div>
+            {detalleId === mascota.id && (
+              <DetalleMascota
+                id={mascota.id}
+                esPropietario={esPropietario}
+                version={version}
+                onCambio={onCambio}
+                onHistorial={onHistorial}
+              />
+            )}
+          </li>
+        ))}
       </ul>
     </section>
   );

@@ -17,7 +17,7 @@ class Usuario(db.Model):
     estado = db.Column(db.Enum("activo", "inactivo", name="estado_usuario"), default="activo")
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
     actualizado_en = db.Column(
-        db.DateTime, server_default=db.func.now(), onupdate=datetime.utcnow
+        db.DateTime, default=datetime.utcnow, server_default=db.func.now(), onupdate=datetime.utcnow
     )
 
     mascotas = db.relationship(
@@ -56,7 +56,7 @@ class Mascota(db.Model):
     activo = db.Column(db.Boolean, default=True, nullable=False)
     sexo = db.Column(db.String(10), nullable=True)
     actualizado_en = db.Column(
-        db.DateTime, server_default=db.func.now(), onupdate=datetime.utcnow
+        db.DateTime, default=datetime.utcnow, server_default=db.func.now(), onupdate=datetime.utcnow
     )
 
     propietario = db.relationship("Usuario", back_populates="mascotas")
@@ -80,6 +80,17 @@ class Mascota(db.Model):
             "sexo": self.sexo,
             "actualizado_en": self.actualizado_en.isoformat() if self.actualizado_en else None,
         }
+
+
+class PacienteVeterinario(db.Model):
+    __tablename__ = "paciente_veterinario"
+
+    mascota_id = db.Column(
+        db.Integer, db.ForeignKey("mascota.id", ondelete="CASCADE"), primary_key=True
+    )
+    veterinario_id = db.Column(
+        db.Integer, db.ForeignKey("usuario.id", ondelete="CASCADE"), primary_key=True, index=True
+    )
 
 
 class CatalogoProducto(db.Model):

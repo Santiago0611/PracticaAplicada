@@ -49,7 +49,9 @@ CREATE TABLE `mascota` (
   `fecha_nacimiento` date DEFAULT NULL,
   `peso` decimal(5,2) DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL,
-  `activo` tinyint(1) DEFAULT 1
+  `activo` tinyint(1) DEFAULT 1,
+  `sexo` varchar(10) DEFAULT NULL,
+  `actualizado_en` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -83,7 +85,8 @@ CREATE TABLE `usuario` (
   `contrasena_hash` varchar(255) NOT NULL,
   `rol` enum('propietario','veterinario') NOT NULL,
   `estado` enum('activo','inactivo') DEFAULT 'activo',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `actualizado_en` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -183,3 +186,12 @@ CREATE TABLE token_revocado (
   jti VARCHAR(36) NOT NULL UNIQUE,
   fecha_revocado DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE paciente_veterinario (
+  mascota_id INT NOT NULL,
+  veterinario_id INT NOT NULL,
+  PRIMARY KEY (mascota_id, veterinario_id),
+  KEY ix_paciente_veterinario_veterinario_id (veterinario_id),
+  FOREIGN KEY (mascota_id) REFERENCES mascota (id) ON DELETE CASCADE,
+  FOREIGN KEY (veterinario_id) REFERENCES usuario (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

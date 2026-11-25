@@ -4,6 +4,7 @@ from email.message import EmailMessage
 
 from flask import Blueprint, jsonify, request
 
+from . import db
 from .decorators import requiere_rol
 from .dosis import obtener_dosis
 from .models import Usuario
@@ -57,14 +58,14 @@ def enviar_recordatorios(usuario_actual):
         return jsonify({"error": "El servicio de correo no está configurado."}), 500
     servidor, puerto, remitente, clave = config
 
-    pendientes = [d for d in obtener_dosis() if d["estado"] in estados]
+    pendientes = [d for d in obtener_dosis(usuario_actual) if d["estado"] in estados]
     resumen = {"enviados": 0, "sin_correo": 0, "fallidos": 0, "detalle": []}
 
     try:
         with smtplib.SMTP_SSL(servidor, puerto, timeout=15) as smtp:
             smtp.login(remitente, clave)
             for dosis in pendientes:
-                propietario = Usuario.query.get(dosis["propietario_id"])
+                propietario = db.session.get(Usuario, dosis["propietario_id"])
                 if not propietario or not propietario.correo:
                     resumen["sin_correo"] += 1
                     continue
@@ -83,5 +84,4 @@ def enviar_recordatorios(usuario_actual):
     except Exception:
         return jsonify({"error": "No se pudo conectar con el servidor de correo."}), 500
     
-    return jsonify(resumen),200
-    
+    return jsonify(resumen), 200
