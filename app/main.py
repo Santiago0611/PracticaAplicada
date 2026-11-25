@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from . import app, db, models, auth
 from .mascotas import mascotas_bp
+from .decorators import requiere_rol
+from .validaciones import validar_correo, validar_contrasena
 
 app.register_blueprint(mascotas_bp)
 
@@ -30,6 +32,14 @@ def login():
 def registrar_usuario():
     datos = request.get_json()
 
+    error_correo = validar_correo(datos.get("correo"))
+    if error_correo:
+        return jsonify({"error": error_correo}), 400
+
+    error_contrasena = validar_contrasena(datos.get("contrasena"))
+    if error_contrasena:
+        return jsonify({"error": error_contrasena}), 400
+
     usuario_existente = models.Usuario.query.filter(
         models.Usuario.correo == datos["correo"]
     ).first()
@@ -58,13 +68,27 @@ def registrar_usuario():
 
 
 @app.route("/usuarios/<int:usuario_id>", methods=["PUT"])
-def editar_usuario(usuario_id):
+@requiere_rol(models.Usuario.ROL_PROPIETARIO, models.Usuario.ROL_VETERINARIO)
+def editar_usuario(usuario_id, usuario_actual):
+    if usuario_actual.id != usuario_id:
+        return jsonify({"detalle": "No tiene permisos para realizar esta acción."}), 403
+
     usuario = models.Usuario.query.get(usuario_id)
 
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    datos = request.get_json()
+        datos = request.get_json()
+
+    if "correo" in datos:
+        error_correo = validar_correo(datos["correo"])
+        if error_correo:
+            return jsonify({"error": error_correo}), 400
+
+    if "contrasena" in datos:
+        error_contrasena = validar_contrasena(datos["contrasena"])
+        if error_contrasena:
+            return jsonify({"error": error_contrasena}), 400
 
     if "nombre" in datos:
         usuario.nombre = datos["nombre"]
@@ -92,11 +116,15 @@ def editar_usuario(usuario_id):
 
 
 @app.route("/mascotas/<int:mascota_id>", methods=["PUT"])
-def editar_mascota(mascota_id):
+@requiere_rol(models.Usuario.ROL_PROPIETARIO)
+def editar_mascota(mascota_id, usuario_actual):
     mascota = models.Mascota.query.filter_by(id=mascota_id, activo=True).first()
 
     if not mascota:
         return jsonify({"error": "Mascota no encontrada"}), 404
+
+    if mascota.propietario_id != usuario_actual.id:
+        return jsonify({"detalle": "No tiene permisos para realizar esta acción."}), 403
 
     datos = request.get_json()
 
