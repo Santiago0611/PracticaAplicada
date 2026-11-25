@@ -1,7 +1,13 @@
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt
 from . import app, db, models, auth
 from .mascotas import mascotas_bp
 from .registros import registros_bp
+from .catalogo import catalogo_bp
+
+app.register_blueprint(mascotas_bp)
+app.register_blueprint(registros_bp)
+app.register_blueprint(catalogo_bp)
 from .dosis import dosis_bp
 from .notificaciones import notificaciones_bp
 from .catalogo import catalogo_bp
@@ -126,6 +132,13 @@ def editar_mascota(mascota_id):
     db.session.commit()
 
     return jsonify(mascota.to_dict()), 200
-
+@app.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]
+    db.session.add(models.TokenRevocado(jti=jti))
+    db.session.commit()
+    return jsonify({"mensaje": "Sesión cerrada correctamente"}), 200
+    
 if __name__ == "__main__":
     app.run(debug=True)

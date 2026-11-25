@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request
 from . import db
 from .decorators import requiere_rol
 from .models import CatalogoProducto, Mascota, RegistroAplicacion, Usuario
+from .models import CatalogoProducto, Mascota, RegistroAplicacion
 from .calculos import calcular_proxima_dosis
 registros_bp = Blueprint("registros", __name__)
 
