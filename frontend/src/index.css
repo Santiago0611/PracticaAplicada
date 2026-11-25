@@ -35,3 +35,28 @@ button {
 }
 button:hover { background: #276749; }
 .error { color: #c53030; margin-top: 12px; font-size: 0.9rem; }
+
+.contenedor { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+.barra { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.barra button { width: auto; margin: 0; padding: 8px 14px; }
+.formulario { display: grid; gap: 8px; margin-bottom: 20px; }
+.formulario button { margin-top: 4px; }
+.lista { list-style: none; padding: 0; }
+.lista li { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; }
+.lista button { width: auto; margin: 0; padding: 6px 12px; }
+.peligro { background: #c53030; }
+.peligro:hover { background: #9b2c2c; }
+select { padding: 10px; border: 1px solid #c5cdd3; border-radius: 8px; font-size: 1rem; }
+.dosis { border-left: 6px solid #a0aec0; }
+.dosis.vencida { border-left-color: #c53030; }
+.dosis.proxima { border-left-color: #d69e2e; }
+.dosis.al_dia { border-left-color: #2f855a; }
+.detalle { font-size: 0.85rem; color: #52606d; margin-top: 2px; }
+.etiqueta { font-size: 0.85rem; font-weight: 600; }
+.dosis.vencida .etiqueta { color: #c53030; }
+.dosis.proxima .etiqueta { color: #b7791f; }
+.dosis.al_dia .etiqueta { color: #2f855a; }
+.pestanas { display: flex; gap: 8px; margin-bottom: 12px; }
+.pestanas button { margin: 0; background: #cbd5e0; color: #1f2933; }
+.pestanas button.activa { background: #2f855a; color: #fff; }
+.exito { color: #276749; margin-top: 12px; font-size: 0.9rem; }

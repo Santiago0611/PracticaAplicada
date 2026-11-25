@@ -39,6 +39,10 @@ def _validar_payload_mascota(data: dict) -> dict:
         except (TypeError, ValueError):
             errores["peso_kg"] = "El peso debe ser un número."
 
+        sexo = (data.get("sexo") or "").lower() or None
+    if sexo not in (None, "macho", "hembra"):
+        errores["sexo"] = "El sexo debe ser 'macho' o 'hembra'."
+
     return {
         "errores": errores,
         "datos_limpios": {
@@ -47,6 +51,8 @@ def _validar_payload_mascota(data: dict) -> dict:
             "raza": (data.get("raza") or "").strip(),
             "fecha_nacimiento": fecha_nacimiento,
             "peso_kg": peso_kg,
+            "sexo": sexo,
+
         },
     }
 
@@ -66,6 +72,7 @@ def registrar_mascota(usuario_actual: Usuario):
         propietario_id=usuario_actual.id,
         nombre=limpio["nombre"],
         especie=limpio["especie"],
+        sexo=limpio["sexo"],
         activo=True,
     ).first()
     if duplicado:
@@ -81,6 +88,7 @@ def registrar_mascota(usuario_actual: Usuario):
         raza=limpio["raza"],
         fecha_nacimiento=limpio["fecha_nacimiento"],
         peso=limpio["peso_kg"],
+         sexo=limpio["sexo"],
     )
 
     db.session.add(mascota)

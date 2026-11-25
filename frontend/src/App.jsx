@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Login from "./Login";
 import { api } from "./api";
+import Mascotas from "./Mascotas";
+import Dosis from "./Dosis";
+import RegistrarAplicacion from "./RegistrarAplicacion";
 
 function leerUsuario() {
   try {
@@ -12,6 +15,7 @@ function leerUsuario() {
 
 export default function App() {
   const [usuario, setUsuario] = useState(leerUsuario());
+  const [version, setVersion] = useState(0);
 
   async function cerrarSesion() {
     try {
@@ -27,10 +31,14 @@ export default function App() {
   if (!usuario) return <Login onLogin={setUsuario} />;
 
   return (
-    <div className="tarjeta">
-      <h1>Hola, {usuario.nombre}</h1>
-      <p>Rol: {usuario.rol}</p>
-      <button onClick={cerrarSesion}>Cerrar sesión</button>
+    <div className="contenedor">
+      <header className="barra">
+        <span>Hola, {usuario.nombre} ({usuario.rol})</span>
+        <button onClick={cerrarSesion}>Cerrar sesión</button>
+      </header>
+      <RegistrarAplicacion usuario={usuario} onRegistrado={() => setVersion((v) => v + 1)} />
+      <Dosis version={version} />
+      <Mascotas usuario={usuario} />
     </div>
   );
 }
